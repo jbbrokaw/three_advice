@@ -1,4 +1,5 @@
 # Data for the threes game
+from __future__ import unicode_literals
 
 def _blanks(rows=4, columns=4):
     return [[None] * columns] * rows
@@ -54,6 +55,30 @@ class Tile(object):
 
         return neighbor_list
 
+    def shift(self, neighbor_attribute):
+        """Move neighbor into self if possible, unless already shifted"""
+        neighbor = self.__getattribute__(neighbor_attribute)
+        if neighbor is None:
+            return False  # Cannot have shifted at the last possibility
+
+        if (  # We can combine here
+                (self.value == neighbor.value) or
+                ((self.value == 1) and (neighbor.value == 2)) or
+                ((self.value == 2) and (neighbor.value == 1))
+            ):
+            self.value = self.value + neighbor.value
+            neighbor.value = None
+            neighbor.shift()
+            # Don't care about return value of neighbor shift, we know we shifted
+            return True
+        elif self.value is None:  # Just move neighbor into this tile
+            self.value = neighbor.value
+            neighbor.value = None
+            neighbor.shift()  # Don't care about return value, we know we shifted
+            return True
+        else:  # We cannot shift, try the next one in line
+            return neighbor.shift(neighbor_attribute)
+
 
 class Board(list):  # we want indexing/slicing, along with some helper functions
     """A nested list of tiles for the Threes game"""
@@ -79,3 +104,31 @@ class Board(list):  # we want indexing/slicing, along with some helper functions
         return [
             [tile.value for tile in row] for row in self
         ]
+
+    def shift(self, direction):
+        """Make a threes move, wherein you shift tiles up, down, left, or right"""
+        if direction == "up":
+            targets = self[0]
+            neighbor_attribute = 'lower_neighbor'
+
+        elif direction == "down":
+            targets = self[-1]
+            neighbor_attribute = 'upper_neighbor'
+
+        elif direction == "left":
+            targets = [row[0] for row in self]
+            neighbor_attribute = 'lower_neighbor'
+
+        elif direction == "right":
+            targets = [row[-1] for row in self]
+            neighbor_attribute = 'lower_neighbor'
+
+        else:
+            raise ValueError('Shift direction must be up, down, left, or right')
+
+        success = False
+        for target in targets:
+            if target.shift(neighbor_attribute):  # Returns True if this column moved, False if not
+                success = True
+
+        return success  # False is game over, True we are fine
