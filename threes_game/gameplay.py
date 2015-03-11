@@ -61,20 +61,20 @@ class Tile(object):
         if neighbor is None:
             return False  # Cannot have shifted at the last possibility
 
-        if (  # We can combine here
-                (self.value == neighbor.value) or
+        if (  # We can combine in the following cases
+                ((self.value >= 3) and (self.value == neighbor.value)) or
                 ((self.value == 1) and (neighbor.value == 2)) or
                 ((self.value == 2) and (neighbor.value == 1))
-            ):
+                ):
             self.value = self.value + neighbor.value
             neighbor.value = None
-            neighbor.shift()
+            neighbor.shift(neighbor_attribute)
             # Don't care about return value of neighbor shift, we know we shifted
             return True
         elif self.value is None:  # Just move neighbor into this tile
             self.value = neighbor.value
             neighbor.value = None
-            neighbor.shift()  # Don't care about return value, we know we shifted
+            neighbor.shift(neighbor_attribute)  # Don't care about return value, we know we shifted
             return True
         else:  # We cannot shift, try the next one in line
             return neighbor.shift(neighbor_attribute)
@@ -117,11 +117,11 @@ class Board(list):  # we want indexing/slicing, along with some helper functions
 
         elif direction == "left":
             targets = [row[0] for row in self]
-            neighbor_attribute = 'lower_neighbor'
+            neighbor_attribute = 'right_neighbor'
 
         elif direction == "right":
             targets = [row[-1] for row in self]
-            neighbor_attribute = 'lower_neighbor'
+            neighbor_attribute = 'left_neighbor'
 
         else:
             raise ValueError('Shift direction must be up, down, left, or right')
