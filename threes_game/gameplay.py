@@ -14,38 +14,45 @@ class Tile(object):
 
     @property
     def left_neighbor(self):
-        if self.row <= 0:
-            return None
-        else:
-            return self.board[self.row - 1][self.column]
-
-    @property
-    def right_neighbor(self):
-        if self.row >= (self.board.rows - 1):
-            return None
-        else:
-            return self.board[self.row + 1][self.column]
-
-    @property
-    def upper_neighbor(self):
         if self.column <= 0:
             return None
         else:
-            return self.board[self.row ][self.column - 1]
+            return self.board[self.row][self.column - 1]
 
     @property
-    def lower_neighbor(self):
+    def right_neighbor(self):
         if self.column >= (self.board.columns - 1):
             return None
         else:
             return self.board[self.row][self.column + 1]
 
     @property
+    def upper_neighbor(self):
+        if self.row <= 0:
+            return None
+        else:
+            return self.board[self.row - 1][self.column]
+
+    @property
+    def lower_neighbor(self):
+        if self.row >= (self.board.rows - 1):
+            return None
+        else:
+            return self.board[self.row + 1][self.column]
+
+    @property
     def neighbors(self):
-        return [self.left_neighbor,
-                self.right_neighbor,
-                self.upper_neighbor,
-                self.lower_neighbor]
+        neighbor_list = list()
+        if self.left_neighbor:
+            neighbor_list.append(self.left_neighbor)
+        if self.right_neighbor:
+            neighbor_list.append(self.right_neighbor)
+        if self.upper_neighbor:
+            neighbor_list.append(self.upper_neighbor)
+        if self.lower_neighbor:
+            neighbor_list.append(self.lower_neighbor)
+
+        return neighbor_list
 
 
 class Board(list):  # we want indexing/slicing, along with some helper functions
